@@ -1,0 +1,69 @@
+<div class="row section-div ">
+  <div class="col s6 content_div">
+    <h4>Custom Validations</h4>
+    <ul>
+      <li>
+        <h5 class="flow-text-header">Custom Validators</h5>
+        <p class="flow-text">
+          Custom validators are classes that inherit from ActiveModel::Validator.
+          These classes must implement the validate method which takes a record as an
+          argument and performs the validation on it. The custom validator is called
+          using the validates_with method.
+        </p>
+        <pre class="brush: ruby">
+          class MyValidator < ActiveModel::Validator
+            def validate(record)
+              unless record.name.starts_with? 'X'
+                record.errors[:name] << 'Need a name starting with X please!'
+              end
+            end
+          end
+
+          class Person
+            include ActiveModel::Validations
+            validates_with MyValidator
+          end
+        </pre>
+      </li>
+      <li>
+        <h5 class="flow-text-header">Custom Methods</h5>
+        <p class="flow-text">
+          You can also create methods that verify the state
+          of your models and add messages to the errors collection when they are invalid.
+        </p>
+        <pre class="brush: ruby">
+          class Invoice < ApplicationRecord
+            validate :expiration_date_cannot_be_in_the_past,
+              :discount_cannot_be_greater_than_total_value
+
+            def expiration_date_cannot_be_in_the_past
+              if expiration_date.present? && expiration_date < Date.today
+                errors.add(:expiration_date, "can't be in the past")
+              end
+            end
+
+            def discount_cannot_be_greater_than_total_value
+              if discount > total_value
+                errors.add(:discount, "can't be greater than total value")
+              end
+            end
+          end
+        </pre>
+      </li>
+    </ul>
+  </div>
+  <div class="col s6">
+    <%= OpalIrbUtils.include_code_mirror.html_safe %>
+  </div>
+</div>
+<script>
+  $(document).ready(function(){
+    SyntaxHighlighter.all({
+      'quick-code': false
+    });
+    $('#console').style('margin-top', "-485px", 'important')
+    $(".content_div").mCustomScrollbar({
+      theme:"rounded-dark"
+    });
+  })
+</script>
